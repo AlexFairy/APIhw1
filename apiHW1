@@ -1,0 +1,95 @@
+import requests
+import json
+
+
+#-------------------------------------POKEMON-------------------------------------------
+
+#Task 1: Obtain name and abilities
+#Making the bridge
+api_url = "https://pokeapi.co/api/v2/pokemon/pikachu"
+response = requests.get(api_url)
+json_data = response.text
+
+#Convert into dictionary data type
+converted_data = json.loads(json_data)
+
+print(f"Pokemon Name: {converted_data["name"]}")
+print(f"Pokemon Ability List: {converted_data["abilities"]}")
+print(f"Pokemon Weight: {converted_data["weight"]}lbs")
+
+
+#Task 2
+def fetch_pokemon_data(pokemon_name):
+  
+  url = f"https://pokeapi.co/api/v2/pokemon/{pokemon_name}"
+  response = requests.get(url)
+  json_data = response.json()
+
+  collected_data = {
+      "name": json_data["name"], 
+      "abilities": [ability["ability"]["name"] for ability in json_data["abilities"]], 
+    }
+
+  return collected_data
+
+def calculate_average_weight(pokemon_list):
+  url = f"https://pokeapi.co/api/v2/pokemon/{pokemon_list}"
+  response = requests.get(url)
+  json_data = response.json()
+
+  collected_data = {
+      "name": json_data["name"],
+      "avg_weight": json_data["weight"] / 10 
+    }
+
+  return collected_data
+
+def main():
+    pokemon_names = ["pikachu", "bulbasaur", "charmander"]
+
+    for poke in pokemon_names:
+        poke_data = fetch_pokemon_data(poke)
+        print(f"Name: {poke_data['name']}\n Abilities: {', '.join(poke_data['abilities'])}")
+
+    for poke in pokemon_names:
+       poke_data = calculate_average_weight(poke)
+       print(f"Pokemon Name:{poke_data['name']}\n Weight: {poke_data['avg_weight']}")
+
+if __name__ == "__main__":
+    main()
+
+#------------------------------------ASTRONOMY-----------------------------------------------
+
+#Task 1
+
+def fetch_planet_data():
+    url = "https://api.le-systeme-solaire.net/rest/bodies/"
+    response = requests.get(url)
+    planets = response.json()['bodies']
+
+    for planet in planets:
+        if planet['isPlanet']:
+            name = planet['englishName']
+            mass = planet.get('mass', 'value')
+            orbit_period = planet['sideralOrbit']
+            print(f"Planet: {name}, Mass: {mass}, Orbit Period: {orbit_period} days")
+          
+fetch_planet_data()
+
+
+
+#Task 2: 
+
+def fetch_planet_data():
+    url = "https://api.le-systeme-solaire.net/rest/bodies/"
+    response = requests.get(url)
+    planetary_data = [body for body in response.json()['bodies'] if body['isPlanet']]
+    return [(data['englishName'], data['mass']['massValue']) for data in planetary_data]
+
+
+def find_heaviest_planet(planets):
+    return max(planets, key=lambda x: x[1])
+
+planetary_data = fetch_planet_data()
+name, mass = find_heaviest_planet(planetary_data)
+print(f"The heaviest planet is {name} with a mass of {mass} kg.")
